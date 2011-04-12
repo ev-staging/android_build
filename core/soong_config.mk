@@ -155,6 +155,7 @@ $(call add_json_bool, Device_support_hwfde,              $(filter true,$(TARGET_
 $(call add_json_bool, Device_support_hwfde_perf,         $(filter true,$(TARGET_HW_DISK_ENCRYPTION_PERF)))
 $(call add_json_list, DeviceKernelHeaders,               $(TARGET_DEVICE_KERNEL_HEADERS) $(TARGET_BOARD_KERNEL_HEADERS) $(TARGET_PRODUCT_KERNEL_HEADERS))
 $(call add_json_str,  VendorApiLevel,                    $(BOARD_API_LEVEL))
+$(call add_json_str,  TargetSpecificHeaderPath,          $(TARGET_SPECIFIC_HEADER_PATH))
 $(call add_json_list, ExtraVndkVersions,                 $(PRODUCT_EXTRA_VNDK_VERSIONS))
 $(call add_json_list, DeviceSystemSdkVersions,           $(BOARD_SYSTEMSDK_VERSIONS))
 $(call add_json_str,  RecoverySnapshotVersion,           $(RECOVERY_SNAPSHOT_VERSION))
