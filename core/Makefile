@@ -3768,6 +3768,18 @@ tool_extension := $(wildcard $(tool_extensions)/releasetools.py)
 $(BUILT_TARGET_FILES_PACKAGE): PRIVATE_TOOL_EXTENSIONS := $(tool_extensions)
 $(BUILT_TARGET_FILES_PACKAGE): PRIVATE_TOOL_EXTENSION := $(tool_extension)
 
+ifeq ($(BOARD_USES_UBOOT_MULTIIMAGE),true)
+BOARD_KERNEL_UBOOT_ARGS := -A ARM -O Linux -T multi -C none -n Image
+BOARD_UBOOT_ENTRY := $(strip $(BOARD_UBOOT_ENTRY))
+ifdef BOARD_UBOOT_ENTRY
+BOARD_KERNEL_UBOOT_ARGS += -e $(BOARD_UBOOT_ENTRY)
+endif
+BOARD_UBOOT_LOAD := $(strip $(BOARD_UBOOT_LOAD))
+ifdef BOARD_UBOOT_LOAD
+BOARD_KERNEL_UBOOT_ARGS += -a $(BOARD_UBOOT_LOAD)
+endif
+endif
+
 ifeq ($(AB_OTA_UPDATER),true)
 updater_dep := system/update_engine/update_engine.conf
 else
@@ -3953,7 +3965,11 @@ endif
 ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
 	$(hide) echo "$(INSTALLED_DTIMAGE_TARGET)" > $(zip_root)/BOOT/dt_args
 endif
+ifdef BOARD_KERNEL_UBOOT_ARGS
+	$(hide) echo "$(BOARD_KERNEL_UBOOT_ARGS)" > $(zip_root)/BOOT/ubootargs
+endif
 endif # BOARD_USES_RECOVERY_AS_BOOT
+
 	$(hide) $(foreach t,$(INSTALLED_RADIOIMAGE_TARGET),\
 	            mkdir -p $(zip_root)/RADIO; \
 	            cp $(t) $(zip_root)/RADIO/$(notdir $(t));)
