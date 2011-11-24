@@ -159,6 +159,14 @@ Usage:  ota_from_target_files [flags] input_target_files output_ota_package
 
   --override_device <device>
       Override device-specific asserts. Can be a comma-separated list.
+
+  --motd  <string>
+      Insert a MOTD
+
+  --motd-limit  <int>
+      Limit the MOTD to x characters per line (fixes a flashing problem)
+      Default 48 (chosen from the Evo)
+
 """
 
 from __future__ import print_function
@@ -211,7 +219,8 @@ OPTIONS.extracted_input = None
 OPTIONS.key_passwords = []
 OPTIONS.skip_postinstall = False
 OPTIONS.override_device = 'auto'
-
+OPTIONS.motd = None
+OPTIONS.motdLim = 48
 
 METADATA_NAME = 'META-INF/com/android/metadata'
 POSTINSTALL_CONFIG = 'META/postinstall_config.txt'
@@ -808,6 +817,28 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
 
   script.AppendExtra("ifelse(is_mounted(\"/system\"), unmount(\"/system\"));")
   device_specific.FullOTA_InstallBegin()
+
+# MOTD during flash added for Evervolv by cocide
+  if (OPTIONS.motd != None):
+    eachRawMotd = OPTIONS.motd.split("\\n")
+    for eachMotd in eachRawMotd:
+      rawMotd = eachMotd.split()
+      sizedMotd = []
+      for word in rawMotd:
+        sizedMotd += [word[i:i+OPTIONS.motdLim] for i in range(0, len(word), OPTIONS.motdLim)]
+      sizedMotd.reverse()
+      if len(sizedMotd):
+        motdLine = [sizedMotd.pop()]
+      else:
+        motdLine = [""]
+      sizedMotd.reverse()
+      for word in sizedMotd:
+        if ( (motdLine[len(motdLine)-1].__len__() + word.__len__()) < 48):
+          motdLine[len(motdLine)-1] = motdLine[len(motdLine)-1] + " " + word
+        else:
+          motdLine.append(word)
+      for line in motdLine:
+        script.Print(line)
 
   system_progress = 0.75
 
@@ -1841,6 +1872,10 @@ def main(argv):
       OPTIONS.skip_postinstall = True
     elif o in ("--override_device"):
       OPTIONS.override_device = a
+    elif o in ("--motd"):
+      OPTIONS.motd = a
+    elif o in ("--motd-limit"):
+      OPTIONS.motdLim = a
     else:
       return False
     return True
@@ -1872,6 +1907,8 @@ def main(argv):
                                  "extracted_input_target_files=",
                                  "skip_postinstall",
                                  "override_device=",
+                                 "motd=",
+                                 "motd-limit=",
                              ], extra_option_handler=option_handler)
 
   if len(args) != 2:
