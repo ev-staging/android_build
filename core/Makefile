@@ -4209,6 +4209,11 @@ INTERNAL_OTATOOLS_MODULES += \
   vboot_signer
 endif
 
+ifeq (true,$(BOARD_USES_UBOOT_MULTIIMAGE))
+INTERNAL_OTATOOLS_MODULES += \
+  mkimage
+endif
+
 INTERNAL_OTATOOLS_FILES := \
   $(filter $(HOST_OUT)/%,$(call module-installed-files,$(INTERNAL_OTATOOLS_MODULES)))
 
