@@ -107,6 +107,9 @@ UNAME := $(shell uname -sm)
 
 SRC_TARGET_DIR := $(TOPDIR)build/target
 
+# Evervolv
+SRC_EVERVOLV_DIR := $(TOPDIR)vendor/ev
+
 # Some specific paths to tools
 SRC_DROIDDOC_DIR := $(TOPDIR)build/make/tools/droiddoc
 
@@ -992,6 +995,9 @@ $(foreach device,$(call to-upper,$(BOARD_SUPER_PARTITION_BLOCK_DEVICES)), \
     $(eval .KATI_READONLY := BOARD_SUPER_PARTITION_$(device)_DEVICE_SIZE))
 
 endif # PRODUCT_BUILD_SUPER_PARTITION
+
+# Rules for Evervolv targets
+include $(SRC_EVERVOLV_DIR)/build/core/config.mk
 
 # ###############################################################
 # Set up final options.
