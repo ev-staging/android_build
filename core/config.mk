@@ -929,6 +929,9 @@ PLATFORM_SEPOLICY_COMPAT_VERSIONS := \
     PLATFORM_SEPOLICY_VERSION \
     TOT_SEPOLICY_VERSION \
 
+# Rules for QCOM targets
+include $(SRC_EVERVOLV_DIR)/build/core/qcom_target.mk
+
 # ###############################################################
 # Set up final options.
 # ###############################################################
