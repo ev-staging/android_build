@@ -2143,6 +2143,8 @@ ifdef BUILDING_RECOVERY_IMAGE
 
 INTERNAL_RECOVERYIMAGE_FILES := $(filter $(TARGET_RECOVERY_OUT)/%, \
     $(ALL_DEFAULT_INSTALLED_MODULES))
+INTERNAL_RECOVERYIMAGE_FILES += $(filter $(PRODUCT_OUT)/install/%, \
+    $(ALL_DEFAULT_INSTALLED_MODULES))
 
 INSTALLED_FILES_FILE_RECOVERY := $(PRODUCT_OUT)/installed-files-recovery.txt
 INSTALLED_FILES_JSON_RECOVERY := $(INSTALLED_FILES_FILE_RECOVERY:.txt=.json)
@@ -5397,6 +5399,7 @@ ifdef BOARD_GKI_SIGNING_KEY_PATH
 	$(hide) echo 'gki_signing_algorithm=$(BOARD_GKI_SIGNING_ALGORITHM)' >> $@
 	$(hide) echo 'gki_signing_signature_args=$(BOARD_GKI_SIGNING_SIGNATURE_ARGS)' >> $@
 endif
+	$(hide) echo "use_set_metadata=1" >> $@
 	$(hide) echo "multistage_support=1" >> $@
 	$(hide) echo "blockimgdiff_versions=3,4" >> $@
 ifeq ($(PRODUCT_BUILD_GENERIC_OTA_PACKAGE),true)
@@ -5892,6 +5895,9 @@ $(BUILT_TARGET_FILES_PACKAGE): \
 	@echo "Package target files: $@"
 	$(hide) rm -rf $@ $@.list $(zip_root)
 	$(hide) mkdir -p $(dir $@) $(zip_root)
+	@# OTA install helpers
+	$(hide) $(call package_files-copy-root, \
+	    $(PRODUCT_OUT)/install,$(zip_root)/$(PRIVATE_RECOVERY_OUT)/INSTALL)
 ifneq (,$(INSTALLED_RECOVERYIMAGE_TARGET)$(filter true,$(BOARD_USES_RECOVERY_AS_BOOT))$(filter true,$(BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT)))
 	@# Components of the recovery image
 	$(hide) mkdir -p $(zip_root)/$(PRIVATE_RECOVERY_OUT)
