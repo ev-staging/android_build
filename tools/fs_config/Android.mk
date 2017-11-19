@@ -36,6 +36,12 @@ fs_config_generate_extra_partition_list := $(strip \
   $(if $(BOARD_PRODUCT_SERVICESIMAGE_FILE_SYSTEM_TYPE),product_services) \
 )
 
+ifneq ($(TARGET_FS_CONFIG_GEN),)
+ifeq ($(TARGET_ALLOW_LEGACY_AIDS),true)
+allow_legacy_aids := --allow-legacy-aids
+endif
+endif
+
 ##################################
 # Generate the <p>/etc/fs_config_dirs binary files for each partition.
 # Add fs_config_dirs to PRODUCT_PACKAGES in the device make file to enable.
@@ -97,6 +103,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition system \
 	   --all-partitions "$(subst $(space),$(comma),$(PRIVATE_PARTITION_LIST))" \
@@ -122,6 +129,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition system \
 	   --all-partitions "$(subst $(space),$(comma),$(PRIVATE_PARTITION_LIST))" \
@@ -148,6 +156,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition vendor \
 	   --dirs \
@@ -172,6 +181,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition vendor \
 	   --files \
@@ -199,6 +209,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition oem \
 	   --dirs \
@@ -223,6 +234,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition oem \
 	   --files \
@@ -250,6 +262,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition odm \
 	   --dirs \
@@ -274,6 +287,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition odm \
 	   --files \
@@ -301,6 +315,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition product \
 	   --dirs \
@@ -325,6 +340,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition product \
 	   --files \
@@ -351,6 +367,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition product_services \
 	   --dirs \
@@ -375,6 +392,7 @@ $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/fs_config_generator.py $(TARGET_FS_CONFIG_G
 	@mkdir -p $(dir $@)
 	$< fsconfig \
 	   --aid-header $(PRIVATE_ANDROID_FS_HDR) \
+	    $(allow_legacy_aids) \
 	   --capability-header $(PRIVATE_ANDROID_CAP_HDR) \
 	   --partition product_services \
 	   --files \
