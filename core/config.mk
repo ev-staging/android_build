@@ -991,8 +991,8 @@ endif
 
 endif # PRODUCT_USE_DYNAMIC_PARTITION_SIZE
 
-# Rules for QCOM targets
-include $(SRC_EVERVOLV_DIR)/build/core/qcom_target.mk
+# Rules for Evervolv targets
+include $(SRC_EVERVOLV_DIR)/build/core/config.mk
 
 # ###############################################################
 # Set up final options.
