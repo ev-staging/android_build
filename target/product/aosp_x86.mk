@@ -23,6 +23,10 @@
 
 -include device/generic/goldfish/x86-vendor.mk
 
+# TODO(b/78308559): includes vr_hwc into GSI before vr_hwc move to vendor
+PRODUCT_PACKAGES += \
+    vr_hwc
+
 include $(SRC_TARGET_DIR)/product/full_x86.mk
 
 # Enable dynamic partition size
