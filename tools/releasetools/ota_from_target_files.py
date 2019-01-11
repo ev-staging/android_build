@@ -860,6 +860,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   script.SetPermissionsRecursive("/tmp/install/bin", 0, 0, 0755, 0755, None, None)
 
   if OPTIONS.backuptool:
+    script.Print("Backing up settings")
     script.Mount("/system")
     script.RunBackup("backup")
     script.Unmount("/system")
@@ -908,6 +909,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
 
   if OPTIONS.backuptool:
     script.ShowProgress(0.02, 10)
+    script.Print("Restoring settings")
     script.Mount("/system")
     script.RunBackup("restore")
     script.Unmount("/system")
