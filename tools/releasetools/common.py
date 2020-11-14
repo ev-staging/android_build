@@ -1160,7 +1160,7 @@ def BuildVBMeta(image_path, partitions, name, needed_partitions):
     assert OPTIONS.aftl_signer_helper is not None, 'No AFTL signer helper provided.'
     # AFTL inclusion proof generation code will go here.
 
-def _MakeRamdisk(sourcedir, fs_config_file=None, lz4_ramdisks=False, xz_ramdisks=False):
+def _MakeRamdisk(sourcedir, fs_config_file=None, ramdisk_compressor="gzip"):
   ramdisk_img = tempfile.NamedTemporaryFile()
 
   if fs_config_file is not None and os.access(fs_config_file, os.F_OK):
@@ -1169,10 +1169,13 @@ def _MakeRamdisk(sourcedir, fs_config_file=None, lz4_ramdisks=False, xz_ramdisks
   else:
     cmd = ["mkbootfs", os.path.join(sourcedir, "RAMDISK")]
   p1 = Run(cmd, stdout=subprocess.PIPE)
-  if lz4_ramdisks:
+  if ramdisk_compressor == "lz4":
     p2 = Run(["lz4", "-l", "-12" , "--favor-decSpeed"], stdin=p1.stdout,
              stdout=ramdisk_img.file.fileno())
-  elif xz_ramdisks:
+  elif ramdisk_compressor == "lzma":
+    p2 = Run(["lzma", "-f", "-c"], stdin=p1.stdout,
+             stdout=ramdisk_img.file.fileno())
+  elif ramdisk_compressor == "xz":
     p2 = Run(["xz", "-f", "-c", "--check=crc32", "--lzma2=dict=32MiB"], stdin=p1.stdout,
              stdout=ramdisk_img.file.fileno())
   else:
@@ -1204,6 +1207,7 @@ def _BuildBootableImage(image_name, sourcedir, fs_config_file, info_dict=None,
 
   if partition_name == "recovery":
     kernel = "kernel"
+    compressor = info_dict.get("recovery_compressor")
   else:
     kernel = image_name.replace("boot", "kernel")
     kernel = kernel.replace(".img","")
@@ -1215,13 +1219,14 @@ def _BuildBootableImage(image_name, sourcedir, fs_config_file, info_dict=None,
 
   if info_dict is None:
     info_dict = OPTIONS.info_dict
-
   img = tempfile.NamedTemporaryFile()
 
   if has_ramdisk:
-    use_lz4 = info_dict.get("lz4_ramdisks") == 'true'
-    use_xz = info_dict.get("xz_ramdisks") == 'true'
-    ramdisk_img = _MakeRamdisk(sourcedir, fs_config_file, lz4_ramdisks=use_lz4, xz_ramdisks=use_xz)
+    if partition_name == "recovery":
+      compressor = info_dict.get("recovery_compressor")
+    else:
+      compressor = info_dict.get("boot_compressor")
+    ramdisk_img = _MakeRamdisk(sourcedir, fs_config_file, ramdisk_compressor=compressor)
 
   # use MKBOOTIMG from environ, or "mkbootimg" if empty or not set
   mkbootimg = os.getenv('MKBOOTIMG') or "mkbootimg"
@@ -1425,9 +1430,8 @@ def _BuildVendorBootImage(sourcedir, info_dict=None):
 
   img = tempfile.NamedTemporaryFile()
 
-  use_lz4 = info_dict.get("lz4_ramdisks") == 'true'
-  use_xz = info_dict.get("xz_ramdisks") == 'true'
-  ramdisk_img = _MakeRamdisk(sourcedir, lz4_ramdisks=use_lz4, xz_ramdisks=use_xz)
+  compressor = info_dict.get("boot_compressor")
+  ramdisk_img = _MakeRamdisk(sourcedir, ramdisk_compressor=compressor)
 
   # use MKBOOTIMG from environ, or "mkbootimg" if empty or not set
   mkbootimg = os.getenv('MKBOOTIMG') or "mkbootimg"
@@ -3080,11 +3084,12 @@ def MakeRecoveryPatch(input_dir, output_sink, recovery_img, boot_img,
 
   else:
     system_root_image = info_dict.get("system_root_image") == "true"
+    use_bsdiff = info_dict.get("no_gzip_recovery_ramdisk") == "true"
     path = os.path.join(input_dir, recovery_resource_dat_path)
     # With system-root-image, boot and recovery images will have mismatching
     # entries (only recovery has the ramdisk entry) (Bug: 72731506). Use bsdiff
-    # to handle such a case.
-    if system_root_image:
+    # to handle such a case.    if system_root_image or use_bsdiff:
+    if system_root_image or use_bsdiff:
       diff_program = ["bsdiff"]
       bonus_args = ""
       assert not os.path.exists(path)
